@@ -8,32 +8,6 @@
 	<form>
 		<label> Please Enter Your Salary</label>
 		<input type="number" class="salary-input" value="45000"></input>
-		<label> Monthly Pay</label>
-		<input type="number" class="monthly-pay"></input>
-		<label> Monthly Rent </label>
-		<input type="number" class="monthly-rent"></input>
-		<label> Food (Groceries and Eating Out)</label>
-		<input type="number" class="food"></input>
-		<label> Transportation</label>
-		<input type="number" class="transportation"></input>
-		<label>Utilities and Phone Bill</label>
-		<input type="number" class="utilities"></label>
-		<label> Minimum Debt Payments</label>
-		<input type="number" class="minimum-debt"></label>
-		<label>Health</label>
-		<input type="number" class="health"></label>
-
-		<label> Fun</label>
-		<input type="number" class="fun"></input>
-		<label> General Savings (10%)</label>
-		<input type="number" class="general-savings"></input>
-		<label> Travel Savings (10%)</label>
-		<input type="number" class="travel-savings"></input>
-		<label>Additional Debt Payments</label>
-		<input type="number" class="additional-debt"></input>
-		<span class="additional-yearly-debt-payment"> </span>
-		<span class="total-yearly-debt-payment"></span>
-
 	</form>
 
 
@@ -42,7 +16,11 @@
 	<script src="js/underscore-min.js"></script>
 	<script src="js/backbone-min.js"></script>
 	<script id="viewTemplate" type="text/template">
-	<%= lat %> <%= lon %>
+	<% var salary = $('.salary-input').val(); %>
+	<label> <%= name %> (<%= percentage * 100%>%) </label>
+	<input type="number" value="<%= percentage * salary / 12 %>" />
+
+
 	</script>
 	<script>
 
@@ -79,11 +57,15 @@
 		var ExpenseView = Backbone.View.extend({
 			el: 'body',
 
+			initialize: function() {
+				this.render(); 
+			},
+
 			render: function() {
-				var data = {lat: 200, lon: 300};
+				var data = this.model.toJSON(); 
 				var template = _.template($('#viewTemplate').text(), data);
 				console.log("Render called");
-				this.$el.prepend(template);
+				this.$el.append(template);
 				return this; 
 			}
 		});
@@ -100,14 +82,15 @@
 
 
 		var m = new Backbone.Model({text: new Date().toString()});
-		// var v = new ExpenseView({ model: m, el : '.append-me'});
-		var rentView = new ExpenseView({ model : rent })
 		var myExpenses = new Expenses([rent, food, transportation, utilities, health, fun, generalSavings, additionalPayments]);
+		myExpenses.each(function(expense){
+			var v = new ExpenseView({ model : expense});
+			console.log("Added new ExpenseView");
+		})
 	
 
 		//when a user enters a new salary value, recalculate the estimated values for the relevant expenses
 		$(document).ready(function() {
-				rentView.render(); 
 
 				$('.salary-input').on("keyup", function() {
 					var salary = $(this).val();
