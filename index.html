@@ -1,100 +1,6 @@
 <html>
 <head>
-	<script src="js/jquery-1.10.1.min.js"></script>
-	<script src="js/underscore-min.js"></script>
-	<script src="js/backbone-min.js"></script>
-	<script>
 
-		
-		var Expense = Backbone.Model.extend({
-			defaults: {
-				name: 'New Expense',
-				percentage: .05, 
-				dollars: 500
-			},
-			initialize: function(){
-				console.log("New expense initialized.");
-			}
-		});
-		
-		var Expenses = Backbone.Collection.extend({
-			model: Expense,
-			defaults: {
-				location: "philadelphia-PA",
-				salary: 45000,
-				paycheck: 45000/12
-			},
-			initialize: function() {
-				var percentages = 0
-				this.each(function(expense){
-					percentages = percentages + expense.get("percentage");
-					});
-				additionalPayments.set({percentage: 1 - percentages});
-				console.log("Initialized Expenses collection");
-				}
-			});
-
-
-		var ExpenseView = Backbone.View.extend({
-			el: '.append-me',
-
-			initialize: function() {
-			//event handler. when the model changes, the view 
-			//is rendered again
-			//note that a 'this' is passed in
-			//to make the context the view
-			this.render(); 
-
-			this.model.on('change', function() {
-				this.render(); 
-			}, this); 
-			},
-			render: function() {
-				console.log("Render is called.");
-				$('.append-me').html("The model's name: " + this.model.get("name"));
-				console.log("Appendme: " + this.$el.html());
-			}
-		});
-
-		var salary = 45000;
-		var rent = new Expense({name: "Rent", percentage: .3, dollars: 900}); 
-		var food = new Expense({name: "Food", percentage: .05});
-		var transportation = new Expense({name: "Transportation", percentage: .05});
-		var utilities = new Expense({name: "Utilities", percentage: .05});
-		var health = new Expense({name: "Health", percentage: .05});
-		var fun = new Expense({name: "Fun", percentage: .05});
-		var generalSavings = new Expense({name: "General Savings", percentage: .1});
-		var additionalPayments = new Expense({name: "Additional Payments"});
-
-
-		var m = new Backbone.Model({text: new Date().toString()});
-		// var v = new ExpenseView({ model: m, el : '.append-me'});
-		var rentView = new ExpenseView({ model : rent })
-		var myExpenses = new Expenses([rent, food, transportation, utilities, health, fun, generalSavings, additionalPayments]);
-	
-		// v.render(); 
-
-		// setInterval(function(){
-		// 	m.set({text: new Date().toString()});
-		// 	}, 1000);
-
-		//when a user enters a new salary value, recalculate the estimated values for the relevant expenses
-		$(document).ready(function() {
-				$('.salary-input').on("keyup", function() {
-					var salary = $(this).val();
-					myExpenses.each(function(expense){
-						expense.set({"dollars": "120"});
-					}); 
-					console.log("renamed");
-				});
-		//end document-ready function
-		});
-
-		//Next Tasks
-		//Create template for the view
-		//View should re-render when any change occurs
-
-	</script>
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
@@ -129,5 +35,94 @@
 		<span class="total-yearly-debt-payment"></span>
 
 	</form>
+
+
+
+		<script src="js/jquery-1.10.1.min.js"></script>
+	<script src="js/underscore-min.js"></script>
+	<script src="js/backbone-min.js"></script>
+	<script id="viewTemplate" type="text/template">
+	<%= lat %> <%= lon %>
+	</script>
+	<script>
+
+		
+		var Expense = Backbone.Model.extend({
+			defaults: {
+				name: 'New Expense',
+				percentage: .05, 
+				dollars: 500
+			},
+			initialize: function(){
+				console.log("New expense initialized.");
+			}
+		});
+		
+		var Expenses = Backbone.Collection.extend({
+			model: Expense,
+			defaults: {
+				location: "philadelphia-PA",
+				salary: 45000,
+				paycheck: 45000/12
+			},
+			initialize: function() {
+				var percentages = 0
+				this.each(function(expense){
+					percentages = percentages + expense.get("percentage");
+					});
+				additionalPayments.set({percentage: 1 - percentages});
+				console.log("Initialized Expenses collection");
+				}
+			});
+
+
+		var ExpenseView = Backbone.View.extend({
+			el: 'body',
+
+			render: function() {
+				var data = {lat: 200, lon: 300};
+				var template = _.template($('#viewTemplate').text(), data);
+				console.log("Render called");
+				this.$el.prepend(template);
+				return this; 
+			}
+		});
+
+		var salary = 45000;
+		var rent = new Expense({name: "Rent", percentage: .3, dollars: 900}); 
+		var food = new Expense({name: "Food", percentage: .05});
+		var transportation = new Expense({name: "Transportation", percentage: .05});
+		var utilities = new Expense({name: "Utilities", percentage: .05});
+		var health = new Expense({name: "Health", percentage: .05});
+		var fun = new Expense({name: "Fun", percentage: .05});
+		var generalSavings = new Expense({name: "General Savings", percentage: .1});
+		var additionalPayments = new Expense({name: "Additional Payments"});
+
+
+		var m = new Backbone.Model({text: new Date().toString()});
+		// var v = new ExpenseView({ model: m, el : '.append-me'});
+		var rentView = new ExpenseView({ model : rent })
+		var myExpenses = new Expenses([rent, food, transportation, utilities, health, fun, generalSavings, additionalPayments]);
+	
+
+		//when a user enters a new salary value, recalculate the estimated values for the relevant expenses
+		$(document).ready(function() {
+				rentView.render(); 
+
+				$('.salary-input').on("keyup", function() {
+					var salary = $(this).val();
+					myExpenses.each(function(expense){
+						expense.set({"dollars": "120"});
+					}); 
+					console.log("renamed");
+				});
+		//end document-ready function
+		});
+
+		//Next Tasks
+		//Create template for the view
+		//View should re-render when any change occurs
+
+	</script>
 </body>
 </html>
