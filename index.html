@@ -8,11 +8,13 @@
 	<form>
 		<label> Please Enter Your Salary</label>
 		<input type="number" class="salary-input" value="45000"></input>
+		<label> Calculated Monthly Paycheck</label>
+		<input type="number" class="paycheck-input"></input>
 	</form>
 
 
 
-		<script src="js/jquery-1.10.1.min.js"></script>
+	<script src="js/jquery-1.10.1.min.js"></script>
 	<script src="js/underscore-min.js"></script>
 	<script src="js/backbone-min.js"></script>
 	<script id="viewTemplate" type="text/template">
@@ -23,6 +25,8 @@
 
 	</script>
 	<script>
+	//set paycheck equal to 1/12 of salary
+	$('.paycheck-input').val($('.salary-input').val() / 12); 
 
 		
 		var Expense = Backbone.Model.extend({
@@ -42,43 +46,38 @@
 				location: "philadelphia-PA",
 				salary: 45000,
 				paycheck: 45000/12
-			},
-			initialize: function() {
-				var percentages = 0
-				this.each(function(expense){
-					percentages = percentages + expense.get("percentage");
-					});
-				additionalPayments.set({percentage: 1 - percentages});
-				console.log("Initialized Expenses collection");
-				}
+			}
 			});
 
 
 		var ExpenseView = Backbone.View.extend({
-			el: 'body',
 
 			initialize: function() {
+				$('body').append(this.$el); 
 				this.render(); 
+				this.model.on('change', function() {
+					this.render(); 
+				}, this);
 			},
 
 			render: function() {
 				var data = this.model.toJSON(); 
 				var template = _.template($('#viewTemplate').text(), data);
 				console.log("Render called");
-				this.$el.append(template);
+				this.$el.html(template);
 				return this; 
 			}
 		});
 
 		var salary = 45000;
-		var rent = new Expense({name: "Rent", percentage: .3, dollars: 900}); 
-		var food = new Expense({name: "Food", percentage: .05});
-		var transportation = new Expense({name: "Transportation", percentage: .05});
-		var utilities = new Expense({name: "Utilities", percentage: .05});
-		var health = new Expense({name: "Health", percentage: .05});
-		var fun = new Expense({name: "Fun", percentage: .05});
-		var generalSavings = new Expense({name: "General Savings", percentage: .1});
-		var additionalPayments = new Expense({name: "Additional Payments"});
+		var rent = new Expense({name: "rent", percentage: .3, dollars: 900}); 
+		var food = new Expense({name: "food", percentage: .05});
+		var transportation = new Expense({name: "transportation", percentage: .05});
+		var utilities = new Expense({name: "utilities", percentage: .05});
+		var health = new Expense({name: "health", percentage: .05});
+		var fun = new Expense({name: "fun", percentage: .05});
+		var generalSavings = new Expense({name: "personal_savings", percentage: .1});
+		var additionalPayments = new Expense({name: "additional_savings"});
 
 
 		var m = new Backbone.Model({text: new Date().toString()});
