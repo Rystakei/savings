@@ -10,28 +10,24 @@
 	<script src="js/underscore-min.js"></script>
 	<script src="js/backbone-min.js"></script>
 	<script id="viewTemplate" type="text/template">
-	<label> Calculated Monthly Paycheck</label>
-	<input type="number" class="paycheck-input"></input>
-
-
 	<form id="plan-form">
 	<label> Please Enter Your Salary</label>
-	<input class="salary" type="number" value="45000"></input>
+	<input class="salary" type="number" value="<%= salary %>"></input>
 	<label> Calculated Monthly Paycheck</label>
-	<input class="paycheck" type="number"></input>
+	<input class="paycheck" type="number" value="<%= paycheck %>"></input>
 
 
-	<label> Rent </label>
-	<input class="rent" type="number" value="<%= rent %>" />
+	<label> Rent (<%= rent *100 %>%) </label>
+	<input class="rent" type="number" value="<%= rent * paycheck %>" />
 
-	<label> Food </label>
-	<input class="food" type="number" value="<%= food %>" />
+	<label> Food (<%= food * 100 %>%) </label>
+	<input class="food" type="number" value="<%= food * paycheck %>" />
 	
-	<label> Debt </label>
-	<input class="debt" type="number" value="<%= debt %>">
+	<label> Debt (<%= debt * 100 %>%) </label>
+	<input class="debt" type="number" value="<%= debt * paycheck %>">
 	
-	<label> Other </label>
-	<input class="other" type="number" value="<%= other %>">
+	<label> Other (<%= other * 100 %>%) </label>
+	<input class="other" type="number" value="<%= other * paycheck %>">
 	</form>
 	</script>
 	<script>
@@ -41,7 +37,8 @@
 		
 		var Plan = Backbone.Model.extend({
 			defaults: {
-				salary: 50000,  
+				salary: 50000,
+				paycheck: 4167,  
 				rent: .25,
 				food: .25,
 				debt: .25,
@@ -74,6 +71,7 @@
 				var template = _.template($('#viewTemplate').text(), data);
 				console.log("Render called");
 				this.$el.html(template);
+				//this line redelegates the events in the view's events property
 				this.delegateEvents(this.events);
 				return this; 
 			},
@@ -81,7 +79,8 @@
 				console.log("calling setRent");
 				var attribute = $(ev.target).attr("class");
 				console.log("Class: " + attribute);
-				var amount = $(ev.target).val(); 
+				var amount = parseInt($(ev.target).val()).toFixed(2) / plan.get("salary"); 
+				console.log(amount);
 				plan.set(attribute, amount);
 			}
 		});
