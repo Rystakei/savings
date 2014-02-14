@@ -64,6 +64,9 @@
 				this.model.on('change', function() {
 					this.render(); 
 				}, this);
+				$('input').on("change", function() {
+					console.log("Input changed to " + $(this).val());
+				});
 			},
 			events: {
 				"change input" : "setRent"
@@ -76,7 +79,9 @@
 				this.delegateEvents(this.events);
 				return this; 
 			},
-			setRent: function(amount){
+			setRent: function(ev){
+				console.log("calling setRent");
+				var amount = $(ev.target).val(); 
 				plan.set("rent", amount);
 			}
 		});
