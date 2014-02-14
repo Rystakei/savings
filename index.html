@@ -16,24 +16,22 @@
 
 	<form id="plan-form">
 	<label> Please Enter Your Salary</label>
-	<input type="number" class="salary-input" value="45000"></input>
+	<input class="salary" type="number" value="45000"></input>
 	<label> Calculated Monthly Paycheck</label>
-	<input type="number" class="paycheck-input"></input>
+	<input class="paycheck" type="number"></input>
 
-	<label> Salary </label>
-	<input type="number" value="<%= salary %>" />
-	
+
 	<label> Rent </label>
 	<input class="rent" type="number" value="<%= rent %>" />
 
 	<label> Food </label>
-	<input type="number" value="food" />
+	<input class="food" type="number" value="<%= food %>" />
 	
 	<label> Debt </label>
-	<input type="number" value="debt">
+	<input class="debt" type="number" value="<%= debt %>">
 	
 	<label> Other </label>
-	<input type="number" value="other">
+	<input class="other" type="number" value="<%= other %>">
 	</form>
 	</script>
 	<script>
@@ -81,8 +79,10 @@
 			},
 			setRent: function(ev){
 				console.log("calling setRent");
+				var attribute = $(ev.target).attr("class");
+				console.log("Class: " + attribute);
 				var amount = $(ev.target).val(); 
-				plan.set("rent", amount);
+				plan.set(attribute, amount);
 			}
 		});
 
