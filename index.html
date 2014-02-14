@@ -5,105 +5,84 @@
 </head>
 <body>
 	<div class="append-me"></div>
-	<form>
-		<label> Please Enter Your Salary</label>
-		<input type="number" class="salary-input" value="45000"></input>
-		<label> Calculated Monthly Paycheck</label>
-		<input type="number" class="paycheck-input"></input>
-	</form>
 
-
-
-	<script src="js/jquery-1.10.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 	<script src="js/underscore-min.js"></script>
 	<script src="js/backbone-min.js"></script>
 	<script id="viewTemplate" type="text/template">
-	<% var salary = $('.salary-input').val(); %>
-	<label> <%= name %> (<%= percentage * 100%>%) </label>
-	<input type="number" value="<%= percentage * salary / 12 %>" />
+	<label> Calculated Monthly Paycheck</label>
+	<input type="number" class="paycheck-input"></input>
 
 
+	<form id="plan-form">
+	<label> Please Enter Your Salary</label>
+	<input type="number" class="salary-input" value="45000"></input>
+	<label> Calculated Monthly Paycheck</label>
+	<input type="number" class="paycheck-input"></input>
+
+	<label> Salary </label>
+	<input type="number" value="<%= salary %>" />
+	
+	<label> Rent </label>
+	<input class="rent" type="number" value="<%= rent %>" />
+
+	<label> Food </label>
+	<input type="number" value="food" />
+	
+	<label> Debt </label>
+	<input type="number" value="debt">
+	
+	<label> Other </label>
+	<input type="number" value="other">
+	</form>
 	</script>
 	<script>
 	//set paycheck equal to 1/12 of salary
 	$('.paycheck-input').val($('.salary-input').val() / 12); 
 
 		
-		var Expense = Backbone.Model.extend({
+		var Plan = Backbone.Model.extend({
 			defaults: {
-				name: 'New Expense',
-				percentage: .05, 
-				dollars: 500
-			},
-			initialize: function(){
-				console.log("New expense initialized.");
+				salary: 50000,  
+				rent: .25,
+				food: .25,
+				debt: .25,
+				other: .25 	
+				},
+			initialize: function() {
+				console.log("New plan initialized.");
 			}
 		});
-		
-		var Expenses = Backbone.Collection.extend({
-			model: Expense,
-			defaults: {
-				location: "philadelphia-PA",
-				salary: 45000,
-				paycheck: 45000/12
-			}
-			});
 
-
-		var ExpenseView = Backbone.View.extend({
+	
+		var PlanView = Backbone.View.extend({
 
 			initialize: function() {
+				var view = this; 
 				$('body').append(this.$el); 
 				this.render(); 
 				this.model.on('change', function() {
 					this.render(); 
 				}, this);
 			},
-
+			events: {
+				"change input" : "setRent"
+			},
 			render: function() {
-				var data = this.model.toJSON(); 
+				var data = this.model.toJSON();
 				var template = _.template($('#viewTemplate').text(), data);
 				console.log("Render called");
 				this.$el.html(template);
+				this.delegateEvents(this.events);
 				return this; 
+			},
+			setRent: function(amount){
+				plan.set("rent", amount);
 			}
 		});
 
-		var salary = 45000;
-		var rent = new Expense({name: "rent", percentage: .3, dollars: 900}); 
-		var food = new Expense({name: "food", percentage: .05});
-		var transportation = new Expense({name: "transportation", percentage: .05});
-		var utilities = new Expense({name: "utilities", percentage: .05});
-		var health = new Expense({name: "health", percentage: .05});
-		var fun = new Expense({name: "fun", percentage: .05});
-		var generalSavings = new Expense({name: "personal_savings", percentage: .1});
-		var additionalPayments = new Expense({name: "additional_savings"});
-
-
-		var m = new Backbone.Model({text: new Date().toString()});
-		var myExpenses = new Expenses([rent, food, transportation, utilities, health, fun, generalSavings, additionalPayments]);
-		myExpenses.each(function(expense){
-			var v = new ExpenseView({ model : expense});
-			console.log("Added new ExpenseView");
-		})
-	
-
-		//when a user enters a new salary value, recalculate the estimated values for the relevant expenses
-		$(document).ready(function() {
-
-				$('.salary-input').on("keyup", function() {
-					var salary = $(this).val();
-					myExpenses.each(function(expense){
-						expense.set({"dollars": "120"});
-					}); 
-					console.log("renamed");
-				});
-		//end document-ready function
-		});
-
-		//Next Tasks
-		//Create template for the view
-		//View should re-render when any change occurs
+		var plan = new Plan(); 
+		var planView = new PlanView({ model: plan }); 
 
 	</script>
 </body>
