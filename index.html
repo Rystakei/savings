@@ -13,22 +13,46 @@
 	<form id="plan-form">
 	<label> Please Enter Your Salary</label>
 	<input class="salary" type="number" value="<%= salary %>"></input>
+
+	<label> Please Enter Your Total Debt</label>
+	<input class="totalDebt" type="number" value="<%= totalDebt %>"></input>
+
 	<label> Calculated Monthly Paycheck</label>
-	<% var paycheck = salary / 12 %>
+	<% var paycheck = (salary / 12).toFixed(2); %>
 	<p> $<%= paycheck %> </p>
 
+	<% var months = totalDebt / ((minDebt + extraDebt) * paycheck)  %>
 
-	<label> Rent (<%= rent *100 %>%) </label>
-	<input class="rent" type="number" value="<%= rent * paycheck %>" />
+	<p> Based on your current income and estimated debt payments, 
+	it looks as though it will take you <%= (months / 12).toFixed(0) %> years and <%= Math.ceil(months % 12) %> months (<%= Math.ceil(months) %> months) to pay off your debt.</p>
 
-	<label> Food (<%= food * 100 %>%) </label>
-	<input class="food" type="number" value="<%= food * paycheck %>" />
+
+
+
+	<label> Rent (<%= (rent *100).toFixed(2) %>%) </label>
+	<input class="rent" type="number" min="0" max="1000" step="20" value="<%= (rent * paycheck).toFixed(2) %>" />
+
+	<label> Food (<%= (food * 100).toFixed(2) %>%) </label>
+	<input class="food" type="number" step="25" value="<%= (food * paycheck).toFixed(2) %>" />
 	
-	<label> Debt (<%= debt * 100 %>%) </label>
-	<input class="debt" type="number" value="<%= debt * paycheck %>">
+	<label> Fun (<%= (fun * 100).toFixed(2) %>%) </label>
+	<input class="fun" type="number" value="<%= (fun * paycheck).toFixed(2) %>">
 	
-	<label> Other (<%= other * 100 %>%) </label>
-	<input class="other" type="number" value="<%= other * paycheck %>">
+	<label> Transportation (<%= (transportation * 100).toFixed(2) %>%) </label>
+	<input class="transportation" type="number" value="<%= (transportation * paycheck).toFixed(2) %>">
+	
+	<label> Savings (<%= (savings * 100).toFixed(2) %>%) </label>
+	<input class="savings" type="number" value="<%= (savings * paycheck).toFixed(2) %>">
+
+	<label> Minimum Debt (<%= (minDebt * 100).toFixed(2) %>%) </label>
+	<input class="minDebt" type="number" value="<%= (minDebt * paycheck).toFixed(2) %>">
+	
+	<label> Extra Debt (<%= (extraDebt * 100).toFixed(2) %>%) </label>
+	<input class="extraDebt" type="number" value="<%= (extraDebt * paycheck).toFixed(2) %>">
+
+
+	<label> Other (<%= (other * 100).toFixed(2) %>%) </label>
+	<input class="other" type="number" value="<%= (other * paycheck).toFixed(2) %>">
 	</form>
 	</script>
 	<script>
@@ -38,11 +62,16 @@
 		
 		var Plan = Backbone.Model.extend({
 			defaults: {
-				salary: 50000,  
+				salary: 50000,
+				totalDebt: 32000,  
 				rent: .25,
-				food: .25,
-				debt: .25,
-				other: .25 	
+				food: .1,
+				fun: .05,
+				transportation: .10,
+				savings: .1, 
+				minDebt: .15,
+				extraDebt: .05,
+				other: 0 	
 				},
 			initialize: function() {
 				console.log("New plan initialized.");
@@ -76,6 +105,7 @@
 				return this; 
 			},
 			setRent: function(ev){
+				var view = this; 
 				console.log("calling setRent");
 				var attribute = $(ev.target).attr("class");
 				console.log("Class: " + attribute);
@@ -85,11 +115,24 @@
 					amount = inputValue; 
 				}	
 				else{
-					amount = inputValue / plan.get("paycheck");
+					amount = inputValue / (plan.get("salary") / 12) ;
+					console.log(inputValue + "/" + plan.get);
 				}
 				// var amount = parseInt($(ev.target).val()).toFixed(2) / plan.get("paycheck"); 
 				console.log(amount);
 				plan.set(attribute, amount);
+
+				var expenses = ["rent", "food", "fun", "transportation", "savings", "minDebt", "extraDebt", "other"]; 
+				var percentages = 0;
+				$.each(expenses, function(i, expense){
+					percentages += view.model.get(expense);
+					console.log(view.model.get(expense));
+				})
+				console.log("Percentages: " + percentages);
+				var other = 1 - percentages; 
+				console.log(other);
+				console.log("Percentages + other : " + parseInt(percentages + other));
+				plan.set("other", other);
 			}
 		});
 
