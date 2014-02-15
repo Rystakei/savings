@@ -30,7 +30,13 @@
 
 
 	<label> Rent (<%= (rent *100).toFixed(2) %>%) </label>
-	<input class="rent" type="number" min="0" max="1000" step="20" value="<%= (rent * paycheck).toFixed(2) %>" />
+	<input class="rent" type="number" min="0"
+	<% if (rent >= other){ %>
+		max="<%= rent * paycheck %>"
+	<% } else { %>
+		max="<%= (rent + other) * paycheck %>"
+	<% } %>
+	step="20" value="<%= (rent * paycheck).toFixed(2) %>" />
 
 	<label> Food (<%= (food * 100).toFixed(2) %>%) </label>
 	<input class="food" type="number" step="25" value="<%= (food * paycheck).toFixed(2) %>" />
@@ -91,6 +97,7 @@
 				$('input').on("change", function() {
 					console.log("Input changed to " + $(this).val());
 				});
+				this.setOther(); 
 			},
 			events: {
 				"change input" : "setRent"
@@ -121,18 +128,21 @@
 				// var amount = parseInt($(ev.target).val()).toFixed(2) / plan.get("paycheck"); 
 				console.log(amount);
 				plan.set(attribute, amount);
-
-				var expenses = ["rent", "food", "fun", "transportation", "savings", "minDebt", "extraDebt", "other"]; 
+				this.setOther();
+			},
+			setOther: function() {
+				var view = this; 
+				var expenses = ["rent", "food", "fun", "transportation", "savings", "minDebt", "extraDebt"]; 
 				var percentages = 0;
 				$.each(expenses, function(i, expense){
 					percentages += view.model.get(expense);
-					console.log(view.model.get(expense));
+					console.log(expense + ":" + view.model.get(expense));
 				})
 				console.log("Percentages: " + percentages);
 				var other = 1 - percentages; 
 				console.log(other);
 				console.log("Percentages + other : " + parseInt(percentages + other));
-				plan.set("other", other);
+				plan.set("other", other);	
 			}
 		});
 
