@@ -10,6 +10,14 @@
 	<script src="js/underscore-min.js"></script>
 	<script src="js/backbone-min.js"></script>
 	<script id="viewTemplate" type="text/template">
+	//Future Tasks
+	// Organize views, models, and templates into separate external script files
+	//Separate all expenses into an array or collection
+	// Modify template to loop through all expenses
+	//Ability to add new loans
+	//Add interest rate to each debt payment
+	//Add in state taxes
+
 	<form id="plan-form">
 	<label> Please Enter Your Salary</label>
 	<input class="salary" type="number" value="<%= salary %>"></input>
@@ -24,7 +32,7 @@
 	<% var months = totalDebt / ((minDebt + extraDebt) * paycheck)  %>
 
 	<p> Based on your current income and estimated debt payments, 
-	it looks as though it will take you <%= (months / 12).toFixed(0) %> years and <%= Math.ceil(months % 12) %> months (<%= Math.ceil(months) %> months) to pay off your debt.</p>
+	it looks as though it will take you <%= (months / 12).toFixed(0) %> years and <%= Math.ceil(months % 12) %> months (<%= months %> months) to pay off your debt.</p>
 
 
 
@@ -62,9 +70,6 @@
 	</form>
 	</script>
 	<script>
-	//set paycheck equal to 1/12 of salary
-	$('.paycheck-input').val($('.salary-input').val() / 12); 
-
 		
 		var Plan = Backbone.Model.extend({
 			defaults: {
