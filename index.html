@@ -14,7 +14,8 @@
 	<label> Please Enter Your Salary</label>
 	<input class="salary" type="number" value="<%= salary %>"></input>
 	<label> Calculated Monthly Paycheck</label>
-	<input class="paycheck" type="number" value="<%= paycheck %>"></input>
+	<% var paycheck = salary / 12 %>
+	<p> $<%= paycheck %> </p>
 
 
 	<label> Rent (<%= rent *100 %>%) </label>
@@ -37,8 +38,7 @@
 		
 		var Plan = Backbone.Model.extend({
 			defaults: {
-				salary: 50000,
-				paycheck: 4167,  
+				salary: 50000,  
 				rent: .25,
 				food: .25,
 				debt: .25,
@@ -79,7 +79,15 @@
 				console.log("calling setRent");
 				var attribute = $(ev.target).attr("class");
 				console.log("Class: " + attribute);
-				var amount = parseInt($(ev.target).val()).toFixed(2) / plan.get("salary"); 
+				var inputValue = parseInt($(ev.target).val()).toFixed(2);
+				var amount; 
+				if (attribute === "salary"){
+					amount = inputValue; 
+				}	
+				else{
+					amount = inputValue / plan.get("paycheck");
+				}
+				// var amount = parseInt($(ev.target).val()).toFixed(2) / plan.get("paycheck"); 
 				console.log(amount);
 				plan.set(attribute, amount);
 			}
